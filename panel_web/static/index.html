@@ -1,0 +1,566 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoreo de Precios y Stock</title>
+
+    <style>
+        :root {
+            --verde: #198754;
+            --verde-claro: #e9f7ef;
+            --fondo: #f4f7f5;
+            --texto: #24332b;
+            --gris: #718078;
+            --borde: #e4ebe6;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--fondo);
+            color: var(--texto);
+        }
+
+        header {
+            background: white;
+            padding: 18px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--borde);
+        }
+
+        .marca {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            background: var(--verde-claro);
+            color: var(--verde);
+            width: 45px;
+            height: 45px;
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            font-size: 25px;
+        }
+
+        h1 {
+            font-size: 21px;
+            margin: 0;
+        }
+
+        .subtitulo {
+            font-size: 13px;
+            color: var(--gris);
+            margin-top: 5px;
+        }
+
+        .conexion {
+            font-size: 13px;
+            color: var(--verde);
+            background: var(--verde-claro);
+            padding: 9px 13px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        main {
+            max-width: 1400px;
+            margin: auto;
+            padding: 28px 5%;
+        }
+
+        .bienvenida {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 23px;
+        }
+
+        .bienvenida h2 {
+            margin: 0 0 7px;
+            font-size: 25px;
+        }
+
+        .bienvenida p {
+            color: var(--gris);
+            margin: 0;
+        }
+
+        .actualizacion {
+            font-size: 12px;
+            color: var(--gris);
+            text-align: right;
+        }
+
+        .metricas {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .tarjeta {
+            background: white;
+            padding: 20px;
+            border: 1px solid var(--borde);
+            border-radius: 15px;
+            box-shadow: 0 3px 12px #183c2810;
+            min-width: 0;
+        }
+
+        .tarjeta .etiqueta {
+            color: var(--gris);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .tarjeta .numero {
+            font-size: 30px;
+            font-weight: 750;
+            margin-top: 12px;
+        }
+
+        .tarjeta .icono {
+            font-size: 21px;
+            margin-bottom: 12px;
+        }
+
+        .verde { color: #198754; }
+        .rojo { color: #dc3545; }
+        .naranja { color: #d97706; }
+        .azul { color: #2874a6; }
+
+        .seccion {
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 15px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .seccion-cabecera {
+            padding: 19px 22px;
+            border-bottom: 1px solid var(--borde);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .seccion-cabecera h3 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .seccion-cabecera p {
+            color: var(--gris);
+            margin: 6px 0 0;
+            font-size: 12px;
+        }
+
+        .tabla-contenedor {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 750px;
+        }
+
+        th, td {
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 1px solid #edf1ee;
+            font-size: 13px;
+        }
+
+        th {
+            background: #f9fbf9;
+            color: var(--gris);
+            font-weight: 600;
+        }
+
+        tbody tr:hover {
+            background: #f9fcfa;
+        }
+
+        .estado {
+            display: inline-block;
+            padding: 6px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 650;
+            white-space: nowrap;
+        }
+
+        .estado-verde {
+            background: #e4f6eb;
+            color: #187746;
+        }
+
+        .estado-rojo {
+            background: #fde8e8;
+            color: #b4232e;
+        }
+
+        .estado-naranja {
+            background: #fff0d9;
+            color: #a65a00;
+        }
+
+        .estado-azul {
+            background: #e7f1fc;
+            color: #225e9b;
+        }
+
+        .vacio {
+            padding: 28px;
+            text-align: center;
+            color: var(--gris);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--gris);
+            font-size: 12px;
+        }
+
+        .error {
+            color: #b4232e;
+            background: #fde8e8;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            display: none;
+        }
+
+        @media (max-width: 1050px) {
+            .metricas {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 650px) {
+            header, .bienvenida {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .actualizacion {
+                text-align: left;
+            }
+
+            .metricas {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .tarjeta {
+                padding: 15px;
+            }
+
+            .tarjeta .numero {
+                font-size: 25px;
+            }
+
+            .bienvenida h2 {
+                font-size: 21px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <div class="marca">
+        <div class="logo">📊</div>
+        <div>
+            <h1>Market Monitor</h1>
+            <div class="subtitulo">Monitoreo inteligente de precios y stock</div>
+        </div>
+    </div>
+    <div class="conexion" id="conexion">● Conectando...</div>
+</header>
+
+<main>
+    <div class="bienvenida">
+        <div>
+            <h2>Panel de control</h2>
+            <p>Supervisa los cambios del mercado y el inventario en tiempo real.</p>
+        </div>
+        <div class="actualizacion">
+            <div>Actualización automática cada 5 segundos</div>
+            <div id="ultimaActualizacion">Esperando datos...</div>
+        </div>
+    </div>
+
+    <div class="error" id="mensajeError"></div>
+
+    <section class="metricas">
+        <div class="tarjeta">
+            <div class="icono azul">📦</div>
+            <div class="etiqueta">Total de eventos</div>
+            <div class="numero" id="totalEventos">—</div>
+        </div>
+
+        <div class="tarjeta">
+            <div class="icono rojo">📈</div>
+            <div class="etiqueta">Subidas de precio</div>
+            <div class="numero rojo" id="subidas">—</div>
+        </div>
+
+        <div class="tarjeta">
+            <div class="icono verde">📉</div>
+            <div class="etiqueta">Bajadas de precio</div>
+            <div class="numero verde" id="bajadas">—</div>
+        </div>
+
+        <div class="tarjeta">
+            <div class="icono naranja">⚠️</div>
+            <div class="etiqueta">Alertas de stock bajo</div>
+            <div class="numero naranja" id="stockBajo">—</div>
+        </div>
+
+        <div class="tarjeta">
+            <div class="icono rojo">🚫</div>
+            <div class="etiqueta">Productos agotados</div>
+            <div class="numero rojo" id="agotados">—</div>
+        </div>
+    </section>
+
+    <section class="seccion">
+        <div class="seccion-cabecera">
+            <div>
+                <h3>📦 Estado de los productos</h3>
+                <p>Último evento conocido para cada producto registrado.</p>
+            </div>
+        </div>
+
+        <div class="tabla-contenedor">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>ID</th>
+                        <th>Precio anterior</th>
+                        <th>Precio actual</th>
+                        <th>Stock anterior</th>
+                        <th>Stock actual</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaProductos">
+                    <tr><td colspan="7" class="vacio">Cargando productos...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="seccion">
+        <div class="seccion-cabecera">
+            <div>
+                <h3>🕒 Últimos eventos procesados</h3>
+                <p>Eventos recibidos y guardados en la base de datos.</p>
+            </div>
+        </div>
+
+        <div class="tabla-contenedor">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Producto</th>
+                        <th>Tipo de evento</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Alerta</th>
+                        <th>Fecha del evento</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaEventos">
+                    <tr><td colspan="7" class="vacio">Cargando eventos...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+<footer>
+    Market Monitor · Kafka + Spark + MySQL · Proyecto académico de monitoreo de comercio electrónico
+</footer>
+
+<script>
+    // Formatear valores monetarios en pesos colombianos.
+    function dinero(valor) {
+        if (valor === null || valor === undefined || valor === "") {
+            return "—";
+        }
+
+        return Number(valor).toLocaleString("es-CO", {
+            style: "currency",
+            currency: "COP",
+            maximumFractionDigits: 0
+        });
+    }
+
+    // Evitar mostrar valores vacíos como si fueran cero.
+    function mostrar(valor) {
+        return valor === null || valor === undefined || valor === ""
+            ? "—"
+            : valor;
+    }
+
+    // Convertir los nombres de las alertas en etiquetas visuales.
+    function claseAlerta(alerta) {
+        if (alerta === "SUBIDA_PRECIO" ||
+            alerta === "PRODUCTO_AGOTADO") {
+            return "estado-rojo";
+        }
+
+        if (alerta === "BAJADA_PRECIO") {
+            return "estado-verde";
+        }
+
+        if (alerta === "STOCK_BAJO") {
+            return "estado-naranja";
+        }
+
+        return "estado-azul";
+    }
+
+    function nombreAlerta(alerta) {
+        const nombres = {
+            SUBIDA_PRECIO: "Subida de precio",
+            BAJADA_PRECIO: "Bajada de precio",
+            STOCK_BAJO: "Stock bajo",
+            PRODUCTO_AGOTADO: "Agotado",
+            OK: "Normal"
+        };
+
+        return nombres[alerta] || mostrar(alerta);
+    }
+
+    // Consultar las métricas de MySQL.
+    async function cargarMetricas() {
+        const respuesta = await fetch("/api/metricas");
+        if (!respuesta.ok) throw new Error("No se pudieron cargar las métricas");
+
+        const datos = await respuesta.json();
+
+        document.getElementById("totalEventos").textContent =
+            datos.total_eventos ?? 0;
+
+        document.getElementById("subidas").textContent =
+            datos.subidas_precio ?? 0;
+
+        document.getElementById("bajadas").textContent =
+            datos.bajadas_precio ?? 0;
+
+        document.getElementById("stockBajo").textContent =
+            datos.stock_bajo ?? 0;
+
+        document.getElementById("agotados").textContent =
+            datos.productos_agotados ?? 0;
+    }
+
+    // Consultar el último estado registrado de cada producto.
+    async function cargarProductos() {
+        const respuesta = await fetch("/api/productos");
+        if (!respuesta.ok) throw new Error("No se pudieron cargar los productos");
+
+        const productos = await respuesta.json();
+        const tabla = document.getElementById("tablaProductos");
+
+        if (productos.length === 0) {
+            tabla.innerHTML =
+                '<tr><td colspan="7" class="vacio">Todavía no hay productos registrados.</td></tr>';
+            return;
+        }
+
+        tabla.innerHTML = productos.map(p => `
+            <tr>
+                <td><strong>${mostrar(p.producto)}</strong></td>
+                <td>${mostrar(p.producto_id)}</td>
+                <td>${dinero(p.precio_anterior)}</td>
+                <td><strong>${dinero(p.precio)}</strong></td>
+                <td>${mostrar(p.stock_anterior)}</td>
+                <td>${mostrar(p.stock)}</td>
+                <td><span class="estado ${claseAlerta(p.alerta)}">${nombreAlerta(p.alerta)}</span></td>
+            </tr>
+        `).join("");
+    }
+
+    // Consultar los 25 eventos más recientes.
+    async function cargarEventos() {
+        const respuesta = await fetch("/api/eventos");
+        if (!respuesta.ok) throw new Error("No se pudieron cargar los eventos");
+
+        const eventos = await respuesta.json();
+        const tabla = document.getElementById("tablaEventos");
+
+        if (eventos.length === 0) {
+            tabla.innerHTML =
+                '<tr><td colspan="7" class="vacio">Todavía no hay eventos registrados.</td></tr>';
+            return;
+        }
+
+        tabla.innerHTML = eventos.map(e => `
+            <tr>
+                <td>${mostrar(e.id)}</td>
+                <td><strong>${mostrar(e.producto)}</strong></td>
+                <td>${mostrar(e.tipo_evento)}</td>
+                <td>${dinero(e.precio)}</td>
+                <td>${mostrar(e.stock)}</td>
+                <td><span class="estado ${claseAlerta(e.alerta)}">${nombreAlerta(e.alerta)}</span></td>
+                <td>${mostrar(e.timestamp_evento)}</td>
+            </tr>
+        `).join("");
+    }
+
+    // Actualizar todas las secciones y comprobar la conexión.
+    async function actualizarPanel() {
+        const mensaje = document.getElementById("mensajeError");
+        const conexion = document.getElementById("conexion");
+
+        try {
+            await Promise.all([
+                cargarMetricas(),
+                cargarProductos(),
+                cargarEventos()
+            ]);
+
+            conexion.textContent = "● Datos actualizados";
+            mensaje.style.display = "none";
+
+            document.getElementById("ultimaActualizacion").textContent =
+                "Última consulta: " +
+                new Date().toLocaleTimeString("es-CO");
+
+        } catch (error) {
+            console.error(error);
+            conexion.textContent = "● Error de conexión";
+            mensaje.textContent =
+                "No fue posible actualizar los datos. Verifica que el backend y MySQL estén funcionando.";
+            mensaje.style.display = "block";
+        }
+    }
+
+    // Primera consulta y actualización automática cada 5 segundos.
+    actualizarPanel();
+    setInterval(actualizarPanel, 5000);
+</script>
+</body>
+</html>
